@@ -1,7 +1,7 @@
-Assignment for lesson 4 (part 1) of PL101 at http://www.nathansuniversity.com/.
+Assignment for lesson 4 of PL101 at http://www.nathansuniversity.com/.
 
-Scheem parser interpreter plus tests. My flavor of Scheem has the following
-deviations from the standard:
+Scheem interpreter plus tests. My flavor of Scheem has the following
+deviations from the 'standard':
 
 * both the + and * operators are variadic
 * the - operator behaves as unary minus receives only one argument
@@ -11,3 +11,5 @@ deviations from the standard:
   the value to return if true and the last one the value to return if false.
   The last two can be omitted, and if returns #t and #f in replacement,
   respectively.
+* supports NIL (converted to null in JavaScript). The support level is quite
+  low, of course.

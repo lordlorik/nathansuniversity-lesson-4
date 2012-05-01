@@ -1,4 +1,4 @@
-var parseScheem, assert, expect;
+var parseScheem, evalScheem, evalScheemString, assert, expect;
 
 if (typeof module !== 'undefined') {
     // In Node load required modules
@@ -11,15 +11,17 @@ if (typeof module !== 'undefined') {
     var fs = require('fs');
 	var scheem = require('../scheem');
 
-    var evalScheem = scheem.evalScheem;
-    var evalScheemString = scheem.evalScheemString;
-    
+    evalScheem = scheem.evalScheem;
+    evalScheemString = scheem.eval;
 	parseScheem = PEG.buildParser(fs.readFileSync('scheem.peg', 'utf-8')).parse;
 } else {
     // In browser assume already loaded by <script> tags
-    parseScheem = scheem.parse;
     assert = chai.assert;
     expect = chai.expect;
+
+    evalScheem = scheem.evalScheem;
+    evalScheemString = scheem.eval;
+    parseScheem = scheemParser.parse;
 }
 
 suite('quote', function () {
@@ -76,11 +78,10 @@ suite('car', function () {
             1
         );
     });
-    test('null', function () {
-        assert.deepEqual(
-            evalScheem(['car', ['quote', []]]),
-            null
-        );
+    test('empty list', function () {
+        expect(function () {
+            evalScheem(['car', ['quote', []]]);
+        }).to.throw();
     });
     test('too many parameters', function () {
         expect(function () {
@@ -101,17 +102,16 @@ suite('cdr', function () {
             [3, 4]
         );
     });
-    test('an empty list', function () {
+    test('a single element list', function () {
         assert.deepEqual(
             evalScheem(['cdr', ['quote', [1]]]),
             []
         );
     });
     test('an empty list', function () {
-        assert.deepEqual(
-            evalScheem(['car', ['quote', []]]),
-            null
-        );
+        expect(function () {
+            evalScheem(['cdr', ['quote', []]]);
+        }).to.throw();
     });
     test('too many parameters', function () {
         expect(function () {
@@ -494,7 +494,7 @@ suite('evaluation', function () {
     });
     test('if', function () {
         assert.deepEqual(
-            evalScheemString('(if (= 3 3) \'(x y) \'(z w))''),
+            evalScheemString('(if (= 3 3) \'(x y) \'(z w))'),
             ['x', 'y']
         );
     });

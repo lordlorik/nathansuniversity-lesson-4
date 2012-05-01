@@ -35,11 +35,11 @@
 		
         log(input);
         try {
-            var parsed = scheem.parse(input);
+            var parsed = scheemParser.parse(input);
 			
             log('<< PARSED ' + JSON.stringify(parsed) + ' >>');
             try {
-                var result = evalScheem(parsed, env);
+                var result = scheem.evalScheem(parsed, env);
 				
                 log('> ' + JSON.stringify(result));
             }
