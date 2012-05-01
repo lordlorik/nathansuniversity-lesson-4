@@ -31,6 +31,64 @@ else {
     parseScheem = scheemParser.parse;
 }
 
+suite('define', function () {
+    test('define', function () {
+        var env = { b: 1 };
+		
+        evalScheem(['define', 'a', 3], env);
+        assert.deepEqual(
+            env,
+            { a: 3, b: 1 }
+        );
+    });
+    test('define already defined', function () {
+        expect(function () {
+            evalScheem(['define', 'a', 3], { a: 5 });
+        }).to.throw();
+    });
+    test('define too many parameters', function () {
+        expect(function () {
+            evalScheem(['define', 'a', 3, 4]);
+        }).to.throw();
+    });
+    test('define a number', function () {
+        expect(function () {
+            evalScheem(['define', '5', 3]);
+        }).to.throw();
+    });
+});
+
+suite('set!', function () {
+    test('set!', function () {
+        var env = { a: 4, b: 1 };
+		
+        evalScheem(['set!', 'a', 3], env);
+        assert.deepEqual(
+			env,
+            { a: 3, b: 1 }
+        );
+    });
+    test('set! too many parameters', function () {
+        expect(function () {
+            evalScheem(['set!', 'a', 3, 4]);
+        }).to.throw();
+    });
+    test('set! not yet defined', function () {
+        expect(function () {
+            evalScheem(['set!', 'a', 3]);
+        }).to.throw();
+    });
+    test('set! expression', function () {
+        var env = { a: 4, b: 1 };
+		
+        evalScheem(['set!', 'a', ['+', 1, 2]], env);
+        assert.deepEqual(
+			env,
+            { a: 3, b: 1 }
+        );
+    });
+});
+
 suite('quote', function () {
     test('a number', function () {
         assert.deepEqual(
@@ -132,64 +190,6 @@ suite('cdr', function () {
     });
 });
 
-suite('define', function () {
-    test('define', function () {
-        var env = { b: 1 };
-		
-        evalScheem(['define', 'a', 3], env);
-        assert.deepEqual(
-            env,
-            { a: 3, b: 1 }
-        );
-    });
-    test('define already defined', function () {
-        expect(function () {
-            evalScheem(['define', 'a', 3], { a: 5 });
-        }).to.throw();
-    });
-    test('define too many parameters', function () {
-        expect(function () {
-            evalScheem(['define', 'a', 3, 4]);
-        }).to.throw();
-    });
-    test('define a number', function () {
-        expect(function () {
-            evalScheem(['define', '5', 3]);
-        }).to.throw();
-    });
-});
-
-suite('set!', function () {
-    test('set!', function () {
-        var env = { a: 4, b: 1 };
-		
-        evalScheem(['set!', 'a', 3], env);
-        assert.deepEqual(
-			env,
-            { a: 3, b: 1 }
-        );
-    });
-    test('set! too many parameters', function () {
-        expect(function () {
-            evalScheem(['set!', 'a', 3, 4]);
-        }).to.throw();
-    });
-    test('set! not yet defined', function () {
-        expect(function () {
-            evalScheem(['set!', 'a', 3]);
-        }).to.throw();
-    });
-    test('set! expression', function () {
-        var env = { a: 4, b: 1 };
-		
-        evalScheem(['set!', 'a', ['+', 1, 2]], env);
-        assert.deepEqual(
-			env,
-            { a: 3, b: 1 }
-        );
-    });
-});
-
 suite('begin', function () {
     test('a number', function () {
         assert.deepEqual(
@@ -259,6 +259,16 @@ suite('if', function () {
             '#f'
         );
     });
+    test('if too many parameters', function () {
+        expect(function () {
+            evalScheem(['if', '#t', 4, 5, 6]);
+        }).to.throw();
+    });
+    test('if no parameters', function () {
+        expect(function () {
+            evalScheem(['if']);
+        }).to.throw();
+    });
 });
 
 suite('math', function () {
@@ -280,11 +290,10 @@ suite('math', function () {
             6
         );
     });
-    test('add multiple', function () {
-        assert.deepEqual(
-            evalScheem(['+', 1, 2, 3]),
-            6
-        );
+    test('add invalid', function () {
+        expect(function () {
+            evalScheem(['+', 1, [2]]);
+        }).to.throw();
     });
     test('subtract', function () {
         assert.deepEqual(
@@ -292,11 +301,21 @@ suite('math', function () {
             -1 
         );
     });
+    test('substract invalid', function () {
+        expect(function () {
+            evalScheem(['-', 1, [2]]);
+        }).to.throw();
+    });
     test('unary minus', function () {
         assert.deepEqual(
             evalScheem(['-', 1]),
             -1
         );
+    });
+    test('unary minus invalid', function () {
+        expect(function () {
+            evalScheem(['-', [2]]);
+        }).to.throw();
     });
     test('multiply', function () {
         assert.deepEqual(
@@ -316,17 +335,32 @@ suite('math', function () {
             24
         );
     });
+    test('multiply invalid', function () {
+        expect(function () {
+            evalScheem(['*', 1, [2]]);
+        }).to.throw();
+    });
     test('divide', function () {
         assert.deepEqual(
             evalScheem(['/', 12, 3]),
             4 
         );
     });
+    test('divide invalid', function () {
+        expect(function () {
+            evalScheem(['/', 1, [2]]);
+        }).to.throw();
+    });
     test('modulus', function () {
         assert.deepEqual(
             evalScheem(['%', 7, 3]),
             1
         );
+    });
+    test('modulus invalid', function () {
+        expect(function () {
+            evalScheem(['%', 1, [2]]);
+        }).to.throw();
     });
 });
 
@@ -418,16 +452,16 @@ suite('comparison', function () {
 });
 
 suite('parse', function () {
-    test('alphanumeric atoms', function () {
+    test('alphanumeric atom', function () {
         assert.deepEqual(
-            parseScheem('a'),
-            'a'
+            parseScheem('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         );
     });
-    test('special char atom', function () {
+    test('special chars atom', function () {
         assert.deepEqual(
-            parseScheem('!'),
-            '!'
+            parseScheem('_?!+\-=@#$%^&*/.'),
+            '_?!+\-=@#$%^&*/.'
         );
     });
     test('numeric atom', function () {
@@ -456,8 +490,8 @@ suite('parse', function () {
     });
     test('nested list, single element', function () {
         assert.deepEqual(
-            parseScheem('((a))'),
-            [['a']]
+            parseScheem('(((a)))'),
+            [[['a']]]
         );
     });
     test('nested list, complex', function () {

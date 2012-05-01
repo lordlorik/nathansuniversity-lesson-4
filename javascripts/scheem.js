@@ -4,16 +4,13 @@ scheem = (function () {
 	if (typeof module !== 'undefined') {
 		var PEG = require('pegjs');
 		var fs = require('fs');
-		var grammar;
 
 		try {
-			grammar = fs.readFileSync('scheem.peg', 'utf-8');
-			parseScheem = PEG.buildParser().parse;
+			parseScheem = PEG.buildParser(fs.readFileSync('scheem.peg', 'utf-8')).parse;
 		}
 		catch (e) {
-			grammar = fs.readFileSync('../scheem.peg', 'utf-8');
+			parseScheem = PEG.buildParser(fs.readFileSync('../scheem.peg', 'utf-8')).parse;
 		}
-		parseScheem = PEG.buildParser(grammar).parse;
 	}
 	else {
 		parseScheem = scheemParser.parse;
