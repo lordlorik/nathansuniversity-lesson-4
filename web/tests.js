@@ -125,7 +125,7 @@ suite('cdr', function () {
     });
 });
 
-suite('environment', function () {
+suite('define', function () {
     test('define', function () {
         var env = { b: 1 };
 		
@@ -145,6 +145,14 @@ suite('environment', function () {
             evalScheem(['define', 'a', 3, 4]);
         }).to.throw();
     });
+    test('define a number', function () {
+        expect(function () {
+            evalScheem(['define', '5', 3]);
+        }).to.throw();
+    });
+});
+
+suite('set!', function () {
     test('set!', function () {
         var env = { a: 4, b: 1 };
 		
@@ -257,6 +265,12 @@ suite('math', function () {
         assert.deepEqual(
             evalScheem(['+', 1]),
             1
+        );
+    });
+    test('add multiple', function () {
+        assert.deepEqual(
+            evalScheem(['+', 1, 2, 3]),
+            6
         );
     });
     test('add multiple', function () {
@@ -476,6 +490,12 @@ suite('evaluation', function () {
         assert.deepEqual(
             evalScheemString('(begin (define x 5) (+ x 2))'),
             7
+        );
+    });
+    test('if', function () {
+        assert.deepEqual(
+            evalScheemString('(if (= 3 3) \'(x y) \'(z w))''),
+            ['x', 'y']
         );
     });
 });

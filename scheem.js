@@ -41,7 +41,7 @@ var evalScheem = function (expr, env) {
 			if (len == 1) throw('Incorrect number of arguments');
 			tmp = 0;
 			for (var i = 1; i < len; ++i) {
-				tmp += +evalScheem(expr[i], env);
+				tmp += evalScheem(expr[i], env);
 			}
             return tmp;
 
@@ -73,6 +73,7 @@ var evalScheem = function (expr, env) {
         case 'define':
 			if (len != 3) throw('Incorrect number of arguments');
 			tmp = expr[1];
+			if (typeof tmp !== 'string' || +tmp === tmp) throw('Invalid symbol');
 			if (typeof env[tmp] !== 'undefined') throw('Symbol already defined');
             env[tmp] = evalScheem(expr[2], env);
             return 0;
