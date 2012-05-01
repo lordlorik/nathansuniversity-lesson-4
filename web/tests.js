@@ -3,6 +3,7 @@ var parseScheem, evalScheem, evalScheemString, assert, expect;
 if (typeof module !== 'undefined') {
     // In Node load required modules
 	var chai = require('chai');
+	var mocha = require('mocha');
 	
     assert = chai.assert;
     expect = chai.expect;
@@ -10,11 +11,17 @@ if (typeof module !== 'undefined') {
     var PEG = require('pegjs');
     var fs = require('fs');
 	var scheem = require('../scheem');
-
+	
+	try {
+		parseScheem = PEG.buildParser(fs.readFileSync('scheem.peg', 'utf-8')).parse;
+	}
+	catch (e) {
+		parseScheem = PEG.buildParser(fs.readFileSync('../scheem.peg', 'utf-8')).parse;
+	}
     evalScheem = scheem.evalScheem;
     evalScheemString = scheem.eval;
-	parseScheem = PEG.buildParser(fs.readFileSync('scheem.peg', 'utf-8')).parse;
-} else {
+}
+else {
     // In browser assume already loaded by <script> tags
     assert = chai.assert;
     expect = chai.expect;
