@@ -62,8 +62,8 @@ scheem = (function () {
 
 			case '-':
 				if (len > 3 || len < 2) throw('Incorrect number of arguments');
-				if (len == 2) return -evalScheem(expr[1], env);
 				tmp = evalScheem(expr[1], env);
+				if (len == 2) return checkNumber(tmp) && -tmp;
 				tmp2 = evalScheem(expr[2], env);
 				return checkNumber(expr[1]) && checkNumber(expr[2]) && tmp - tmp2;
 
